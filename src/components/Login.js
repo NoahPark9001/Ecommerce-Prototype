@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase';
 import loginBg from '../assets/login-bg.png';
 import logo from '../assets/login-logo.png';
 
@@ -9,18 +10,26 @@ function Login({ setUser }) {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Invalid email address');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('password', password);
+
+    if (error) {
+      setError(error.message);
       return;
     }
 
-    // 로그인 로직을 추가합니다.
-    const loggedInUser = { name: email }; // 예시: 이메일을 유저 이름으로 사용
-    setUser(loggedInUser);
-    navigate('/');
+    if (users.length > 0) {
+      setUser(users[0]);
+      navigate('/');
+    } else {
+      setError('Invalid email or password');
+    }
   };
 
   return (
@@ -36,7 +45,7 @@ function Login({ setUser }) {
           onClick={() => navigate('/')}
         />
         <h1 className="text-3xl font-bold mb-6 text-blue-600">Welcome back!</h1>
-        <form className="w-full max-w-sm" onSubmit={e => e.preventDefault()}>
+        <form className="w-full max-w-sm" onSubmit={handleLogin}>
           {error && <p className="text-red-500">{error}</p>}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -48,7 +57,7 @@ function Login({ setUser }) {
               type="email"
               placeholder="e-mail"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-6">
@@ -61,7 +70,7 @@ function Login({ setUser }) {
               type="password"
               placeholder="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <div className="flex items-center justify-between mb-6">
@@ -73,12 +82,11 @@ function Login({ setUser }) {
           <div className="flex flex-col space-y-4">
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-              onClick={handleLogin}
+              type="submit"
             >
               Login
             </button>
-            <Link to="/signup" className="text-blue-600 hover:underline text-center">Create Account</Link>
+            <a href="/signup" className="text-blue-600 hover:underline text-center">Create Account</a>
           </div>
         </form>
       </div>

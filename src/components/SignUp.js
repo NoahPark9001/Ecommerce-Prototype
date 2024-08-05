@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase';
 import logo from '../assets/login-logo.png';
 
 function SignUp() {
@@ -9,15 +10,18 @@ function SignUp() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSignUp = () => {
-    // 이메일 형식 검증
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Invalid email address');
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ email, password, name }]);
+
+    if (error) {
+      setError(error.message);
       return;
     }
 
-    // 회원가입 로직을 추가합니다.
     console.log('User signed up:', { email, name, password });
     navigate('/login');
   };
@@ -32,7 +36,7 @@ function SignUp() {
           onClick={() => navigate('/')}
         />
         <h1 className="text-3xl font-bold mb-6 text-blue-600">Create Account</h1>
-        <form className="w-full max-w-sm" onSubmit={e => e.preventDefault()}>
+        <form className="w-full max-w-sm" onSubmit={handleSignUp}>
           {error && <p className="text-red-500">{error}</p>}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -44,7 +48,7 @@ function SignUp() {
               type="email"
               placeholder="e-mail"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-4">
@@ -57,7 +61,7 @@ function SignUp() {
               type="text"
               placeholder="name"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="mb-6">
@@ -70,18 +74,17 @@ function SignUp() {
               type="password"
               placeholder="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <div className="flex flex-col space-y-4">
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-              onClick={handleSignUp}
+              type="submit"
             >
               Sign up
             </button>
-            <Link to="/login" className="text-blue-600 hover:underline text-center">Already have an account? Log in</Link>
+            <a href="/login" className="text-blue-600 hover:underline text-center">Already have an account? Log in</a>
           </div>
         </form>
       </div>

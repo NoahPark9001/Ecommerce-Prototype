@@ -13,24 +13,45 @@ function Login({ setUser }) {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .eq('password', password);
+   //Check if the email field is empty
+   if (email === '') {
+    setError('Please enter your e-mail address');
+    return;
+  }
 
-    if (error) {
-      setError(error.message);
-      return;
-    }
+  //Query to check if the email exists
+  const { data: users, error: fetchError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', email);
 
-    if (users.length > 0) {
-      setUser(users[0]);
-      navigate('/');
-    } else {
-      setError('Invalid email or password');
-    }
-  };
+  if (fetchError) {
+    setError('An unexpected error occurred. Please try again.');
+    return;
+  }
+
+  //Check if the user exists
+  if (users.length === 0) {
+    setError('We cannot find an account with that e-mail address');
+    return;
+  }
+
+  //Check if password field is empty
+  if (password === '') {
+    setError('Please enter your password');
+    return;
+  }
+
+  // Query to check if password exists
+  const user = users.find(user => user.password === password);
+  if (user) {
+    setUser(user);
+    navigate('/');
+  } else {
+    setError('Incorrect password. Please enter your password again');
+  }
+};
+
 
   return (
     <div className="flex h-screen">

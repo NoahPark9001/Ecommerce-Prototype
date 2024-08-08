@@ -19,17 +19,13 @@ function Header({ user, onLogout }) {
           Tap
         </a>
       </nav>
-      <div className="flex items-center space-x-4">
-        <img
-          src={logo}
-          alt="Logo"
-          className="h-10 cursor-pointer"
-          onClick={() => navigate("/")}
-        />
-        <div className="text-2xl font-bold">TOP Tradings</div>
+      <div className="flex flex-col items-center justify-center">
+        <img src="/laptop.jpg" alt="Description of the image" className=" mr-2 h-10" />
+        <h1 className='text-xl font-bold text-black'>TOP Tradings</h1>
+                        
       </div>
       <div className="flex items-center space-x-4">
-        <div className="relative">
+        <div className="relative ">
           <input
             type="text"
             placeholder="Search"
@@ -59,6 +55,7 @@ function Header({ user, onLogout }) {
         )}
       </div>
     </header>
+    
   );
 }
 

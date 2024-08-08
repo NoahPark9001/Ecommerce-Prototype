@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Banner from '../components/Banner';
 import { supabase } from '../supabase';
+import Footer from '../components/Footer';
+import CategoryInfo from '../components/categoryInfo';
 
 function Home({ user, onLogout }) {
   const [items, setItems] = useState([]);
@@ -63,7 +65,14 @@ function Home({ user, onLogout }) {
             </li>
           ))}
         </ul>
+        
+        <section className='space-x-11 bg-white px-20 py-5'>
+                <h1 className='text-black font-bold text-2xl mb-4'>Category</h1>
+                <CategoryInfo/>
+        </section>
+       
       </div>
+      <Footer/>
     </div>
   );
 }
